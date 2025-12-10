@@ -8,14 +8,17 @@ import {
   Param,
   ParseIntPipe,
   HttpCode,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/user-create.dto';
 import { UpdateUserDto } from './dto/user-update.dto';
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   // útil apenas para admin
   // @Post()
@@ -26,6 +29,12 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('/help')
+  @UseInterceptors(LoggingInterceptor)
+  help(@Req() req) {
+    return "Info básica do user: ";
   }
 
   @Get(':id')
