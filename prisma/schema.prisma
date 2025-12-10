@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ===================== USERS =====================
+model User {
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(50)
+  email         String         @unique @db.VarChar(100)
+  password      String         @db.VarChar(255)
+  role          Role           @default(USER)
+  images        Image[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+  refreshTokens RefreshToken[]
+
+  // @@index([role])
+  // @@index([createdAt])
+  // @@index([deletedAt])
+  @@map("users")
+}
+
+// ===================== IMAGES =====================
+model Image {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  fileName  String    @db.VarChar(255)
+  filePath  String    @db.VarChar(500)
+  mimeType  String    @db.VarChar(50)
+  size      Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("images")
+}
+
+// ===================== TRASH =====================
+model Trash {
+  id        Int      @id @default(autoincrement())
+  entity    String   @db.VarChar(50)
+  entityId  Int
+  data      Json
+  deletedAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([deletedAt(sort: Desc)])
+  @@map("trash")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tokenHash String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
