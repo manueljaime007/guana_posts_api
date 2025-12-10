@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import 'reflect-metadata';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,8 +17,12 @@ async function bootstrap() {
   );
 
   // habilitar CORS se a API for usada no front
-  // app.enableCors({
-  //   origin: '*',
+  app.enableCors({
+    origin: '*',
+  });
+
+  // app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  //   prefix: '/uploads/', // URL pública: http://localhost:3000/uploads/xxx.jpg
   // });
 
   app.setGlobalPrefix('api/v1');

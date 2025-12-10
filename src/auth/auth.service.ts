@@ -197,7 +197,7 @@ export class AuthService {
       where: { id: matched.id },
       data: { revoked: true },
     });
-    
+
     return { ok: true };
   }
 }
