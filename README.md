@@ -33,6 +33,8 @@ $ pnpm install
 
 ## Compile and run the project
 
+git commit -am "feat:Módulo de auth concluido; configurando dtos para autenticação; configurando strategy-jwt, auth-guard, controllers e services de autenticação"   
+
 ```bash
 # development
 $ pnpm run start
