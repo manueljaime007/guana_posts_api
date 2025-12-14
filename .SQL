@@ -17,8 +17,29 @@ VALUES (
 
 INSERT INTO
     categories (name)
-VALUES ('Paisagens'),
+VALUES ('Animais'),
+    ('Arquitetura'),
+    ('Arte'),
+    ('Beleza'),
+    ('Cidades'),
+    ('Ciência'),
+    ('Comida'),
+    ('Cultura'),
+    ('Design'),
+    ('Educação'),
+    ('Entretenimento'),
+    ('Esportes'),
+    ('Eventos'),
+    ('Fotografia'),
+    ('História'),
+    ('Jogos'),
+    ('Lazer'),
+    ('Moda'),
+    ('Música'),
+    ('Negócios'),
+    ('Natureza'),
     ('Pessoas'),
+    ('Saúde'),
     ('Tecnologia'),
-    ('Animais'),
-    ('Arquitetura');
+    ('Transportes'),
+    ('Viagens');

@@ -19,9 +19,9 @@ async function bootstrap() {
 
   // habilitar CORS se a API for usada no front
   app.enableCors({
-  origin: '*', // ou o host do frontend
-  allowedHeaders: ['Content-Type', 'Authorization'],
-});
+    origin: '*', // ou o host do frontend
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',

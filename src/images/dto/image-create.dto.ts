@@ -7,9 +7,12 @@ export class CreateImageDto {
   @Min(1)
   categoryId: number;
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  tags: string[];
+  @Type(() => String)
+  tags?: string[];
+
 
   @IsOptional()
   @IsString()
