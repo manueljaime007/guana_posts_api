@@ -17,44 +17,46 @@ export class ImagesService {
     file: Express.Multer.File,
     data: CreateImageDto,
   ) {
-    // 1. Garantir que categoryId existe
+    // 1️⃣ Garantir que categoryId existe
     const category = await this.prisma.category.findUnique({
       where: { id: data.categoryId },
     });
     if (!category) throw new Error('Categoria inválida');
 
-    // 2. Processar tags (criar se não existirem)
+    // 2️⃣ Processar tags (criar se não existirem)
+    const tagsArray: string[] = data.tags?.map(t => t.trim()).filter(Boolean) ?? [];
+
+    // Pegar apenas tags existentes no banco que correspondem às do request
     const existingTags = await this.prisma.tag.findMany({
-      where: { name: { in: data.tags } },
+      where: { name: { in: tagsArray } },
     });
 
-    const existingTagNames = existingTags.map((t) => t.name);
+    const existingTagNames = existingTags.map(t => t.name);
 
-    const tagsArray = data.tags ?? []; // se undefined, vira array vazio
-    const newTags = tagsArray.filter(t => !existingTagNames.includes(t));
-
-    const createdTags = await Promise.all(
-      newTags.map((t) =>
-        this.prisma.tag.create({
-          data: { name: t },
-        }),
-      ),
+    // Criar apenas as tags que não existem
+    const newTags = await Promise.all(
+      tagsArray
+        .filter(t => !existingTagNames.includes(t))
+        .map(name =>
+          this.prisma.tag.create({ data: { name } })
+        ),
     );
 
-    const allTags = [...existingTags, ...createdTags];
+    // Todas as tags que serão conectadas à imagem
+    const allTags = [...existingTags, ...newTags];
 
-    // 3. Criar imagem no banco
+    // 3️⃣ Criar imagem no banco
     const image = await this.prisma.image.create({
       data: {
         userId,
         categoryId: data.categoryId,
         fileName: file.originalname,
-        filePath: file.path, // caminho do arquivo salvo
+        filePath: file.path,
         mimeType: file.mimetype,
         size: file.size,
-        description: data.description,
+        description: data.description ?? null,
         tags: {
-          connect: allTags.map((tag) => ({ id: tag.id })),
+          connect: allTags.map(tag => ({ id: tag.id })),
         },
       },
       include: {
