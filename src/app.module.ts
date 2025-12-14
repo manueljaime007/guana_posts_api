@@ -15,8 +15,9 @@ import { ImagesModule } from './images/images.module';
     UsersModule,
     AuthModule,
     ImagesModule,
+
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

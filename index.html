@@ -2,66 +2,88 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Teste de Upload</title>
+  <title>Teste Upload de Imagem</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    .tag { margin: 5px 0; }
+    button { margin-top: 10px; }
+  </style>
 </head>
 <body>
+  <h2>Upload de Imagem</h2>
 
-  <h2>Teste de Upload de Imagem</h2>
+  <label>Token do usuário:</label><br>
+  <input type="text" id="token" style="width: 400px;" placeholder="Cole o Bearer token aqui"><br><br>
 
-  <form id="uploadForm">
-    <label>Token do usuário</label><br>
-    <input type="text" id="token" placeholder="insere o token aqui" required /><br><br>
+  <label>Categoria (ID):</label><br>
+  <input type="number" id="categoryId" value="1"><br><br>
 
-    <label>Imagem</label><br>
-    <input type="file" id="imagem" accept="image/*" required /><br><br>
+  <label>Descrição:</label><br>
+  <input type="text" id="description" style="width: 400px;"><br><br>
 
-    <!-- Se tua rota tiver mais campos, adiciona aqui -->
-    <!-- <input type="text" id="titulo" placeholder="Título"> -->
+  <label>Tags:</label><br>
+  <div id="tagsContainer"></div>
+  <button type="button" id="addTag">Adicionar tag</button><br><br>
 
-    <button type="submit">Enviar</button>
-  </form>
+  <label>Imagem:</label><br>
+  <input type="file" id="file"><br><br>
 
-  <pre id="saida"></pre>
-<!-- 
+  <button type="button" id="uploadBtn">Enviar</button>
+
+  <pre id="response" style="background:#f0f0f0;padding:10px;"></pre>
+
   <script>
-    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const tagsContainer = document.getElementById('tagsContainer');
+    const addTagBtn = document.getElementById('addTag');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const responsePre = document.getElementById('response');
 
-      const token = document.getElementById("token").value;
-      const fileInput = document.getElementById("imagem").files[0];
+    // adiciona campo de tag dinamicamente
+    addTagBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'tag';
+      input.placeholder = 'Tag';
+      tagsContainer.appendChild(input);
+    });
+
+    uploadBtn.addEventListener('click', async () => {
+      const token = document.getElementById('token').value.trim();
+      const categoryId = document.getElementById('categoryId').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const fileInput = document.getElementById('file');
+
+      if (!fileInput.files[0]) {
+        alert('Selecione uma imagem');
+        return;
+      }
+
+      // coleta tags
+      const tags = Array.from(document.querySelectorAll('.tag'))
+                        .map(t => t.value.trim())
+                        .filter(Boolean);
 
       const formData = new FormData();
-      formData.append("file", fileInput); 
-      // se tiver outros campos:
-      // formData.append("title", document.getElementById("titulo").value);
+      formData.append('file', fileInput.files[0]);
+      formData.append('categoryId', categoryId);
+      formData.append('description', description);
+      tags.forEach(tag => formData.append('tags', tag));
 
       try {
-        const resp = await fetch("http://localhost:3000/api/v1/images/upload", {
-          method: "POST",
+        const res = await fetch('http://localhost:3000/api/v1/images/upload', {
+          method: 'POST',
           headers: {
-            "Authorization": `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`
           },
-          body: formData,
+          body: formData
         });
 
-        const data = await resp.json();
-        document.getElementById("saida").textContent = JSON.stringify(data, null, 2);
-
+        const data = await res.json();
+        responsePre.textContent = JSON.stringify(data, null, 2);
       } catch (err) {
-        document.getElementById("saida").textContent = "Erro: " + err.message;
+        responsePre.textContent = 'Erro: ' + err.message;
       }
     });
-  </script> -->
-
-  <script>
-    let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzY1MzczOTA4LCJleHAiOjE3NjUzNzQ4MDh9.2v8unUXWM0hqHSqxlYXWUtwFUAirzVwpUUENFaRbjTY' 
-        fetch('http://localhost:3000/api/v1/images', {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-})
-  .then(r => r.json())
-  .then(console.log);
   </script>
 </body>
 </html>

@@ -30,14 +30,15 @@ CREATE TABLE "images" (
 );
 
 -- CreateTable
-CREATE TABLE "trash" (
+CREATE TABLE "refresh_tokens" (
     "id" SERIAL NOT NULL,
-    "entity" VARCHAR(50) NOT NULL,
-    "entityId" INTEGER NOT NULL,
-    "data" JSONB NOT NULL,
-    "deletedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" INTEGER NOT NULL,
+    "tokenHash" VARCHAR(255) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "revoked" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "trash_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "refresh_tokens_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -53,10 +54,10 @@ CREATE INDEX "images_createdAt_idx" ON "images"("createdAt");
 CREATE INDEX "images_deletedAt_idx" ON "images"("deletedAt");
 
 -- CreateIndex
-CREATE INDEX "trash_entity_entityId_idx" ON "trash"("entity", "entityId");
-
--- CreateIndex
-CREATE INDEX "trash_deletedAt_idx" ON "trash"("deletedAt" DESC);
+CREATE INDEX "refresh_tokens_userId_idx" ON "refresh_tokens"("userId");
 
 -- AddForeignKey
 ALTER TABLE "images" ADD CONSTRAINT "images_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -4,7 +4,7 @@ import { extname } from 'path';
 export const multerConfig = {
   storage: diskStorage({
     destination: './uploads',
-    filename: (req, file, callback) => {
+    filename: (_, file, callback) => {
       const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 10);
       const ext = extname(file.originalname);
       callback(null, uniqueSuffix + ext);

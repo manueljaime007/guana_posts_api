@@ -18,7 +18,7 @@ import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   // útil apenas para admin
   // @Post()
@@ -34,7 +34,7 @@ export class UsersController {
   @Get('/help')
   @UseInterceptors(LoggingInterceptor)
   help(@Req() req) {
-    return "Info básica do user: ";
+    return 'Info básica do user: ';
   }
 
   @Get(':id')

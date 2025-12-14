@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -29,18 +30,18 @@ model User {
 
 // ===================== CATEGORIES =====================
 model Category {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique @db.VarChar(50)
-  images Image[]
+  id      Int      @id @default(autoincrement())
+  name    String   @unique @db.VarChar(50)
+  images  Image[]
 
   @@map("categories")
 }
 
 // ===================== TAGS =====================
 model Tag {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique @db.VarChar(50)
-  images Image[] @relation("ImageTags") // relação Many-to-Many implícita
+  id      Int      @id @default(autoincrement())
+  name    String   @unique @db.VarChar(50)
+  images  Image[]  @relation("ImageTags", references: [id])
 
   @@map("tags")
 }
@@ -57,7 +58,7 @@ model Image {
   description String?   @db.Text
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   category    Category  @relation(fields: [categoryId], references: [id])
-  tags        Tag[]     @relation("ImageTags") // relação Many-to-Many implícita
+  tags        Tag[]     @relation("ImageTags", references: [id])
   createdAt   DateTime  @default(now())
   deletedAt   DateTime?
 
@@ -68,7 +69,7 @@ model Image {
   @@map("images")
 }
 
-// ===================== REFRESH TOKENS =====================
+// ===================== RELAÇÃO REFRESH TOKENS =====================
 model RefreshToken {
   id        Int      @id @default(autoincrement())
   userId    Int
@@ -82,3 +83,21 @@ model RefreshToken {
   @@index([userId])
   @@map("refresh_tokens")
 }
+
+// ===================== RELAÇÃO IMAGEM ↔ TAG (MANY-TO-MANY) =====================
+model _ImageToTag {
+  A Int
+  B Int
+
+  @@id([A, B])
+  @@map("image_tags")
+}
+
+
+refatoramos o schema 
+agora a imagem tem descrição, categoria principal e tags
+onde vamos alterar?
+
+me diz só, como de fosse tarefa para casa, masme dê muitas, muitas dicas
+
+vou fazer sozinho e depois tu fazes a correção

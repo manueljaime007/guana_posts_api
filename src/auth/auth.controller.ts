@@ -63,11 +63,11 @@ export class AuthController {
     return { user: req.user };
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  @Post('upload')
-  uploadImage(@Req() req, @UploadedFile() file) {
-    const userId = req.user.id;
-    // grava na DB com userId
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @UseInterceptors(FileInterceptor('file'))
+  // @Post('upload')
+  // uploadImage(@Req() req, @UploadedFile() file) {
+  //   const userId = req.user.id;
+  //   // grava na DB com userId
+  // }
 }
