@@ -36,7 +36,8 @@ export class ImagesController {
 
   @Get('all')
   async list() {
-    return this.imagesService.findAll();
+    const images = await this.imagesService.findAll();
+    return { total: images.length, images };
   }
 
   // rota pública
