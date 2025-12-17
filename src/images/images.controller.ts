@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -17,10 +18,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ImagesService } from './images.service';
 import { multerConfig } from './config/multer.config';
 import { CreateImageDto } from './dto/image-create.dto';
+import { UpdateImageDto } from './dto/image-update.dto';
 
 @Controller('images')
 export class ImagesController {
-  constructor(private readonly imagesService: ImagesService) {}
+  constructor(private readonly imagesService: ImagesService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post('upload')
@@ -56,6 +58,7 @@ export class ImagesController {
     return { total: images.length, images };
   }
 
+  // 🔹 RESTORE (mais específico)
   @UseGuards(JwtAuthGuard)
   @Patch('restore/:id')
   async restore(@Param('id') id: string, @Req() req) {
@@ -64,16 +67,55 @@ export class ImagesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async softDelete(@Param('id') id: string, @Req() req) {
-    const userId = (req.user as any).id;
-    return this.imagesService.softDelete(userId, Number(id));
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+    @Req() req,
+  ) {
+    const userId = req.user.id;
+
+    let tags: string[] | undefined;
+
+    if (body.tags) {
+      try {
+        // tenta JSON (["a","b"])
+        tags = JSON.parse(body.tags);
+      } catch {
+        // fallback: string simples ("bonho")
+        tags = [body.tags];
+      }
+    }
+
+    const dto: UpdateImageDto = {
+      description: body.description,
+      categoryId: body.categoryId ? Number(body.categoryId) : undefined,
+      tags,
+    };
+
+    console.log('DTO FINAL:', dto);
+
+    return this.imagesService.update(userId, id, dto, file);
   }
 
+
+
+
+  // 🔹 DELETE PERMANENTE (mais específico)
   @UseGuards(JwtAuthGuard)
   @Delete('permanent/:id')
   async deletePermanent(@Param('id') id: string, @Req() req) {
     const userId = (req.user as any).id;
     return this.imagesService.deletePhysical(userId, Number(id));
+  }
+
+  // 🔹 SOFT DELETE (genérico)
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async softDelete(@Param('id') id: string, @Req() req) {
+    const userId = (req.user as any).id;
+    return this.imagesService.softDelete(userId, Number(id));
   }
 }

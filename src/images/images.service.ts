@@ -2,11 +2,13 @@ import {
   BadRequestException,
   Injectable,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto } from './dto/image-create.dto';
 import { promises as fs } from 'fs';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
+import { UpdateImageDto } from './dto/image-update.dto';
 
 @Injectable()
 export class ImagesService {
@@ -84,6 +86,119 @@ export class ImagesService {
       where: { userId, deletedAt: null },
       orderBy: { createdAt: 'desc' },
       include: { category: true, tags: true },
+    });
+  }
+
+
+  //HELPERS
+  //helper par encontrar imagem
+  //HELPERS
+  async findOne(id: number) {
+    const image = await this.prisma.image.findUnique({
+      where: { id },
+      include: {
+        tags: true,
+        category: true,
+      },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return image;
+  }
+
+  private async findOneByUser(imageId: number, userId: number) {
+    const image = await this.prisma.image.findFirst({
+      where: {
+        id: imageId,
+        userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return image;
+  }
+
+  //HELPERS
+
+
+
+  // async update(userId: number, imageId: number, dto: UpdateImageDto) {
+  //   await this.findOneByUser(imageId, userId);
+
+  //   const image = await this.prisma.image.update({
+  //     where: { id: imageId },
+  //     data: {
+  //       description: dto.description,
+  //       categoryId: dto.categoryId,
+
+  //       tags: dto.tags
+  //         ? {
+  //           set: [], // limpa relações antigas
+  //           connectOrCreate: dto.tags.map((name) => ({
+  //             where: { name },
+  //             create: { name },
+  //           })),
+  //         }
+  //         : undefined,
+  //     },
+  //     include: {
+  //       category: true,
+  //       tags: true,
+  //     },
+  //   });
+
+  //   return image;
+  // }
+
+
+  async update(
+    userId: number,
+    imageId: number,
+    dto: UpdateImageDto,
+    file?: Express.Multer.File,
+  ) {
+    await this.findOneByUser(imageId, userId);
+
+    // NORMALIZA TAGS (garante string[])
+    const tags =
+      dto.tags?.flat().filter((t) => typeof t === 'string') ?? undefined;
+
+    return this.prisma.image.update({
+      where: { id: imageId },
+      data: {
+        ...(dto.description !== undefined && {
+          description: dto.description,
+        }),
+
+        ...(dto.categoryId !== undefined && {
+          categoryId: dto.categoryId,
+        }),
+
+        ...(file && {
+          filePath: file.path,
+          mimeType: file.mimetype,
+          size: file.size,
+          fileName: file.originalname,
+        }),
+
+        ...(tags && {
+          tags: {
+            deleteMany: {},
+            create: tags.map((name) => ({ name })),
+          },
+        }),
+      },
+      include: {
+        category: true,
+        tags: true,
+      },
     });
   }
 

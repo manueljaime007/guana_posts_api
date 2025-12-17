@@ -48,26 +48,10 @@ export class AuthController {
     return this.authService.logout(refreshToken);
   }
 
-  // Se for para fazer logout enviando refreshToken no body
-  // @Post('logout')
-  // @HttpCode(200)
-  // async logout(@Body() body: any) {
-  //   const refreshToken = body?.refreshToken;
-  //   return this.authService.logout(refreshToken);
-  // }
-
   // Exemplo: rota protegida
   @UseGuards(JwtAuthGuard)
   @Post('me/test')
   test(@Req() req) {
     return { user: req.user };
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @UseInterceptors(FileInterceptor('file'))
-  // @Post('upload')
-  // uploadImage(@Req() req, @UploadedFile() file) {
-  //   const userId = req.user.id;
-  //   // grava na DB com userId
-  // }
 }
