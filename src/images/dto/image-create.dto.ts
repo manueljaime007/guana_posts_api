@@ -13,7 +13,6 @@ export class CreateImageDto {
   @Type(() => String)
   tags?: string[];
 
-
   @IsOptional()
   @IsString()
   description?: string;

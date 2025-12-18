@@ -5,6 +5,9 @@ show tables;
 
 select * from categories;
 
+SELECT *  from tags;
+
+
 INSERT INTO
     user (name, email, password, `createdAt`, `updatedAt`)
 VALUES (

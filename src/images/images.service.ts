@@ -12,7 +12,7 @@ import { UpdateImageDto } from './dto/image-update.dto';
 
 @Injectable()
 export class ImagesService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(
     userId: number,
@@ -26,22 +26,21 @@ export class ImagesService {
     if (!category) throw new Error('Categoria inválida');
 
     // 2️⃣ Processar tags (criar se não existirem)
-    const tagsArray: string[] = data.tags?.map(t => t.trim()).filter(Boolean) ?? [];
+    const tagsArray: string[] =
+      data.tags?.map((t) => t.trim()).filter(Boolean) ?? [];
 
     // Pegar apenas tags existentes no banco que correspondem às do request
     const existingTags = await this.prisma.tag.findMany({
       where: { name: { in: tagsArray } },
     });
 
-    const existingTagNames = existingTags.map(t => t.name);
+    const existingTagNames = existingTags.map((t) => t.name);
 
     // Criar apenas as tags que não existem
     const newTags = await Promise.all(
       tagsArray
-        .filter(t => !existingTagNames.includes(t))
-        .map(name =>
-          this.prisma.tag.create({ data: { name } })
-        ),
+        .filter((t) => !existingTagNames.includes(t))
+        .map((name) => this.prisma.tag.create({ data: { name } })),
     );
 
     // Todas as tags que serão conectadas à imagem
@@ -58,7 +57,7 @@ export class ImagesService {
         size: file.size,
         description: data.description ?? null,
         tags: {
-          connect: allTags.map(tag => ({ id: tag.id })),
+          connect: allTags.map((tag) => ({ id: tag.id })),
         },
       },
       include: {
@@ -80,6 +79,13 @@ export class ImagesService {
       include: { category: true, tags: true },
     });
   }
+  async findAllDeleted() {
+    return this.prisma.image.findMany({
+      where: { deletedAt: { not: null } },
+      orderBy: { createdAt: 'desc' },
+      include: { category: true, tags: true },
+    });
+  }
 
   async findAllByUser(userId: number) {
     return this.prisma.image.findMany({
@@ -88,7 +94,6 @@ export class ImagesService {
       include: { category: true, tags: true },
     });
   }
-
 
   //HELPERS
   //helper par encontrar imagem
@@ -127,8 +132,6 @@ export class ImagesService {
 
   //HELPERS
 
-
-
   // async update(userId: number, imageId: number, dto: UpdateImageDto) {
   //   await this.findOneByUser(imageId, userId);
 
@@ -156,7 +159,6 @@ export class ImagesService {
 
   //   return image;
   // }
-
 
   async update(
     userId: number,

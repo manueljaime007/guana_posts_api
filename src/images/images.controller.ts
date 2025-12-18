@@ -42,6 +42,12 @@ export class ImagesController {
     return { total: images.length, images };
   }
 
+  @Get('/deleted/all')
+  async listAllDeleted() {
+    const images = await this.imagesService.findAllDeleted();
+    return { total: images.length, images }
+  }
+
   // rota pública
   @Get('user/:id')
   async listPublic(@Param('id') id: string) {
@@ -81,10 +87,8 @@ export class ImagesController {
 
     if (body.tags) {
       try {
-        // tenta JSON (["a","b"])
         tags = JSON.parse(body.tags);
       } catch {
-        // fallback: string simples ("bonho")
         tags = [body.tags];
       }
     }
@@ -99,9 +103,6 @@ export class ImagesController {
 
     return this.imagesService.update(userId, id, dto, file);
   }
-
-
-
 
   // 🔹 DELETE PERMANENTE (mais específico)
   @UseGuards(JwtAuthGuard)
