@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ImagesModule } from './images/images.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
+import { CollectionsModule } from './collections/collections.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TagsModule } from './tags/tags.module';
     ImagesModule,
     CategoriesModule,
     TagsModule,
+    CollectionsModule,
   ],
   controllers: [],
   providers: [],
